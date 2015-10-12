@@ -61,7 +61,7 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
 
   EkkoLightbox.prototype = {
     modal_shown: function() {
-      var video_id,
+      var $list, video_id,
         _this = this;
       if (!this.options.remote) {
         return this.error('No remote target given');
@@ -76,6 +76,49 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
           this.gallery_index = this.gallery_items.index(this.$element);
           $(document).on('keydown.ekkoLightbox', this.navigate.bind(this));
           if (this.options.directional_arrows && this.gallery_items.length > 1) {
+            if (this.options.preview) {
+              $list = $('<div class="preview-items" />');
+              $.each(this.gallery_items, function(i, item) {
+                var $col, $icon, $title, image;
+                _this.detectRemoteType($(item).attr('href'));
+                $col = $('<div class="preview-item col-xs-2" />');
+                if ($(item).attr('href') === _this.$element.attr('href')) {
+                  $col.addClass('active');
+                }
+                $col.on('click', function(evt) {
+                  evt.preventDefault();
+                  _this.gallery_index = i;
+                  return _this.navigateTo(_this.gallery_index);
+                });
+                switch (_this.options.type) {
+                  case "image":
+                    image = new Image;
+                    image.src = $(item).attr('href');
+                    $(image).attr('width', '100%');
+                    $col.append(image);
+                    break;
+                  case "youtube":
+                  case "vimeo":
+                  case "video":
+                    $icon = $('<span class="glyphicon glyphicon-facetime-video"></span>');
+                    $title = $('<span class="title" />').html(_this.options.type);
+                    $icon.append($title);
+                    $col.append($icon);
+                    break;
+                  default:
+                    $icon = $('<span class="glyphicon glyphicon-picture"></span>');
+                    $title = $('<span class="title" />').html(_this.options.type);
+                    $icon.append($title);
+                    $col.append($icon);
+                }
+                return $list.append($col);
+              });
+              if ($('preview-items').length) {
+                $('preview-items').html($list);
+              } else {
+                this.modal_body.append($list);
+              }
+            }
             this.lightbox_container.append('<div class="ekko-lightbox-nav-overlay"><a href="#" class="' + this.strip_stops(this.options.left_arrow_class) + '"></a><a href="#" class="' + this.strip_stops(this.options.right_arrow_class) + '"></a></div>');
             this.modal_arrows = this.lightbox_container.find('div.ekko-lightbox-nav-overlay').first();
             this.lightbox_container.find('a' + this.strip_spaces(this.options.left_arrow_class)).on('click', function(event) {
@@ -158,6 +201,10 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
       var next, src;
       if (index < 0 || index > this.gallery_items.length - 1) {
         return this;
+      }
+      if (this.options.preview) {
+        $('.preview-item').removeClass('active');
+        $('.preview-item:nth-child(' + (index + 1) + ')').addClass('active');
       }
       this.showLoading();
       this.gallery_index = index;
@@ -374,7 +421,8 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
       options = $.extend({
         remote: $this.attr('data-remote') || $this.attr('href'),
         gallery_parent_selector: $this.attr('data-parent'),
-        type: $this.attr('data-type')
+        type: $this.attr('data-type'),
+        preview: $this.attr('data-preview')
       }, options, $this.data());
       new EkkoLightbox(this, options);
       return this;

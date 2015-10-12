@@ -168,6 +168,13 @@
 										<td>Message injected for loading</td>
 										<td></td>
 									</tr>
+                                    <tr>
+										<td>preview</td>
+										<td>boolean</td>
+										<td><code>false</code></td>
+										<td>Show image gallery items preview in a lightbox window</td>
+										<td></td>
+									</tr>
 								</tbody>
 							</table>
                     	</div>
@@ -200,6 +207,7 @@
                         <li><a href="#hidden-elements">Example #15: Hidden elements</a></li>
                         <li><a href="#remote-content">Example #16: Remote content</a></li>
                         <li><a href="#navigateTo">Example #17: navigateTo</a></li>
+                        <li><a href="#lightbox-preview">Example #18: Gallery of Images with preview via <code>data-preview="true"</code></a></li>
                     </ul>
 
                     <h3 class="page-header" id="single-image">Example #1: Single Image</h3>
@@ -493,6 +501,36 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <h3 class="page-header" id="lightbox-preview">Example #18: Gallery of Images with preview</h3>
+                    <p>Set <code>data-preview="true"</code> for each gallery item you would like to show in a preview section</p>
+                    <div class="row">
+                        <div class="col-md-offset-2 col-md-8">
+                            <div class="row">
+                                <a href="http://41.media.tumblr.com/f37ac708134914c471073e4c0b47328d/tumblr_mrn3dc10Wa1r1thfzo8_1280.jpg" data-toggle="lightbox" data-gallery="withpreview" data-preview="true" data-title="People walking down stairs" class="col-sm-4">
+                                    <img src="//41.media.tumblr.com/f37ac708134914c471073e4c0b47328d/tumblr_mrn3dc10Wa1r1thfzo8_1280.jpg" class="img-responsive">
+                                </a>
+                                <a href="http://41.media.tumblr.com/838b44224e39c30cd43490deb11b919d/tumblr_mrn3dc10Wa1r1thfzo1_1280.jpg" data-toggle="lightbox" data-gallery="withpreview" data-preview="true" data-title="Man getting wet" class="col-sm-4">
+                                    <img src="//41.media.tumblr.com/838b44224e39c30cd43490deb11b919d/tumblr_mrn3dc10Wa1r1thfzo1_1280.jpg" class="img-responsive">
+                                </a>
+                                <a href="http://41.media.tumblr.com/e06a3513b0b36843f54bee99aeac689a/tumblr_mrn3dc10Wa1r1thfzo2_1280.jpg" data-toggle="lightbox" data-gallery="withpreview" data-preview="true" data-title="Someone lost their dress" class="col-sm-4">
+                                    <img src="//41.media.tumblr.com/e06a3513b0b36843f54bee99aeac689a/tumblr_mrn3dc10Wa1r1thfzo2_1280.jpg" class="img-responsive">
+                                </a>
+                            </div>
+                            <div class="row">
+                                <a href="http://41.media.tumblr.com/9d3e6a9c89a856a2ad0be3ab4ca598b2/tumblr_mrn3dc10Wa1r1thfzo4_1280.jpg" data-toggle="lightbox" data-gallery="withpreview" data-preview="true" data-footer="Big ass waterfall- using footer instead of title" class="col-sm-4">
+                                    <img src="//41.media.tumblr.com/9d3e6a9c89a856a2ad0be3ab4ca598b2/tumblr_mrn3dc10Wa1r1thfzo4_1280.jpg" class="img-responsive">
+                                </a>
+                                <a href="http://41.media.tumblr.com/9d3e6a9c89a856a2ad0be3ab4ca598b2/tumblr_mrn3dc10Wa1r1thfzo4_1280.jpg" data-toggle="lightbox" data-gallery="withpreview" data-preview="true" data-title="Cool bottle" data-footer="Now fill it with whiskey" class="col-sm-4">
+                                    <img src="//41.media.tumblr.com/9d3e6a9c89a856a2ad0be3ab4ca598b2/tumblr_mrn3dc10Wa1r1thfzo4_1280.jpg" class="img-responsive">
+                                </a>
+                                <a href="http://36.media.tumblr.com/de356cd6570d7c26e73979467f296f67/tumblr_mrn3dc10Wa1r1thfzo6_1280.jpg" data-toggle="lightbox" data-gallery="withpreview" data-preview="true" class="col-sm-4">
+                                    <img src="//36.media.tumblr.com/de356cd6570d7c26e73979467f296f67/tumblr_mrn3dc10Wa1r1thfzo6_1280.jpg" class="img-responsive">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
 
                 </div>
             </div>
@@ -534,20 +572,19 @@
 				// navigateTo
                 $(document).delegate('*[data-gallery="navigateTo"]', 'click', function(event) {
                     event.preventDefault();
+
+                    var lb;
                     return $(this).ekkoLightbox({
                         onShown: function() {
 
-							var a = this.modal_content.find('.modal-footer a');
-							if(a.length > 0) {
+                            lb = this;
 
-								a.click(function(e) {
+							$(lb.modal_content).on('click', '.modal-footer a', function(e) {
 
-									e.preventDefault();
-									this.navigateTo(2);
+								e.preventDefault();
+								lb.navigateTo(2);
 
-								}.bind(this));
-
-							}
+							});
 
                         }
                     });

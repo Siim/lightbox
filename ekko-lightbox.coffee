@@ -23,7 +23,7 @@ EkkoLightbox = ( element, options ) ->
 	header = '<div class="modal-header"'+(if @options.title or @options.always_show_close then '' else ' style="display:none"')+'><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + (@options.title || "&nbsp;") + '</h4></div>'
 	footer = '<div class="modal-footer"'+(if @options.footer then '' else ' style="display:none"')+'>' + @options.footer + '</div>'
 	$(document.body).append '<div id="' + @modal_id + '" class="ekko-lightbox modal fade" tabindex="-1"><div class="modal-dialog"><div class="modal-content">' + header + '<div class="modal-body"><div class="ekko-lightbox-container"><div></div></div></div>' + footer + '</div></div></div>'
-
+	
 	@modal = $ '#' + @modal_id
 	@modal_dialog = @modal.find('.modal-dialog').first()
 	@modal_content = @modal.find('.modal-content').first()
@@ -63,7 +63,7 @@ EkkoLightbox = ( element, options ) ->
 	.modal 'show', options
 
 	@modal
-
+	
 EkkoLightbox.prototype = {
 	modal_shown: ->
 		# when the modal first loads
@@ -79,10 +79,52 @@ EkkoLightbox.prototype = {
 				else
 					@gallery_items = @$element.parents(this.options.gallery_parent_selector).first().find('*[data-toggle="lightbox"][data-gallery="' + @gallery + '"]')
 				@gallery_index = @gallery_items.index(@$element)
+				
 				$(document).on 'keydown.ekkoLightbox', @navigate.bind(@)
 
 				# add the directional arrows to the modal
 				if @options.directional_arrows && @gallery_items.length > 1
+					
+					# add optins.preview
+					if @options.preview
+						$list = $('<div class="preview-items" />')
+						
+						$.each @gallery_items, (i, item) => 
+							@detectRemoteType($(item).attr('href'))
+							$col = $('<div class="preview-item col-xs-2" />')
+							$col.addClass('active') if $(item).attr('href') == @$element.attr('href')
+							$col.on 'click', (evt) =>
+								evt.preventDefault()
+								@gallery_index = i
+								@navigateTo(@gallery_index)
+							
+							switch @options.type
+								when "image"
+									image = new Image
+									image.src = $(item).attr('href')
+									$(image).attr('width', '100%')
+									$col.append image
+								when "youtube","vimeo", "video"
+									$icon = $('<span class="glyphicon glyphicon-facetime-video"></span>')
+									$title = $('<span class="title" />').html(@options.type)
+									$icon.append($title)
+									$col.append $icon
+								else
+									$icon = $('<span class="glyphicon glyphicon-picture"></span>')
+									$title = $('<span class="title" />').html(@options.type)
+									$icon.append($title)
+									$col.append $icon
+							$list.append $col
+							
+							
+							
+						
+						if $('preview-items').length
+							$('preview-items').html($list)
+						else 
+							@modal_body.append($list)
+
+					
 					@lightbox_container.append('<div class="ekko-lightbox-nav-overlay"><a href="#" class="'+@strip_stops(@options.left_arrow_class)+'"></a><a href="#" class="'+@strip_stops(@options.right_arrow_class)+'"></a></div>')
 					@modal_arrows = @lightbox_container.find('div.ekko-lightbox-nav-overlay').first()
 					@lightbox_container.find('a'+@strip_spaces(@options.left_arrow_class)).on 'click', (event) =>
@@ -146,6 +188,10 @@ EkkoLightbox.prototype = {
 
 		return @ if index < 0 or index > @gallery_items.length-1
 
+		if @options.preview
+			$('.preview-item').removeClass('active')
+			$('.preview-item:nth-child(' + (index+1) + ')').addClass('active')
+
 		@showLoading()
 
 		@gallery_index = index
@@ -168,7 +214,7 @@ EkkoLightbox.prototype = {
 		if @gallery_items.length == 1 then return
 		if @gallery_index == 0 then @gallery_index = @gallery_items.length-1 else @gallery_index-- #circular
 
-		@options.onNavigate.call(@, 'left', @gallery_index)
+		@options.onNavigate.call(@, 'left', @gallery_index)	
 		@navigateTo(@gallery_index)
 
 	navigate_right: ->
@@ -332,6 +378,7 @@ $.fn.ekkoLightbox = ( options ) ->
 			remote : $this.attr('data-remote') || $this.attr('href')
 			gallery_parent_selector : $this.attr('data-parent')
 			type : $this.attr('data-type')
+			preview : $this.attr('data-preview')
 		}, options, $this.data())
 		new EkkoLightbox(@, options)
 		@
