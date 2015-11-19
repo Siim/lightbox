@@ -290,10 +290,15 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
       return this;
     },
     showYoutubeVideo: function(id) {
-      var height, width;
+      var height, rel, width;
+      if ((this.$element.attr('data-norelated') != null) || this.options.no_related) {
+        rel = "&rel=0";
+      } else {
+        rel = "";
+      }
       width = this.checkDimensions(this.$element.data('width') || 560);
       height = width / (560 / 315);
-      return this.showVideoIframe('//www.youtube.com/embed/' + id + '?badge=0&autoplay=1&html5=1', width, height);
+      return this.showVideoIframe('//www.youtube.com/embed/' + id + '?badge=0&autoplay=1&html5=1' + rel, width, height);
     },
     showVimeoVideo: function(id) {
       var height, width;
@@ -436,6 +441,7 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
     directional_arrows: true,
     type: null,
     always_show_close: true,
+    no_related: false,
     loadingMessage: 'Loading...',
     onShow: function() {},
     onShown: function() {},
