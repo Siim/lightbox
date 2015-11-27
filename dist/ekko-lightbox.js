@@ -69,9 +69,9 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
         this.gallery = this.$element.data('gallery');
         if (this.gallery) {
           if (this.options.gallery_parent_selector === 'document.body' || this.options.gallery_parent_selector === '') {
-            this.gallery_items = $(document.body).find('*[data-toggle="lightbox"][data-gallery="' + this.gallery + '"]');
+            this.gallery_items = $(document.body).find('*[data-gallery="' + this.gallery + '"]');
           } else {
-            this.gallery_items = this.$element.parents(this.options.gallery_parent_selector).first().find('*[data-toggle="lightbox"][data-gallery="' + this.gallery + '"]');
+            this.gallery_items = this.$element.parents(this.options.gallery_parent_selector).first().find('*[data-gallery="' + this.gallery + '"]');
           }
           this.gallery_index = this.gallery_items.index(this.$element);
           $(document).on('keydown.ekkoLightbox', this.navigate.bind(this));
@@ -427,7 +427,8 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
         remote: $this.attr('data-remote') || $this.attr('href'),
         gallery_parent_selector: $this.attr('data-parent'),
         type: $this.attr('data-type'),
-        preview: $this.attr('data-preview')
+        preview: $this.attr('data-preview'),
+        no_related: $this.attr('data-norelated') ? false : void 0
       }, options, $this.data());
       new EkkoLightbox(this, options);
       return this;
